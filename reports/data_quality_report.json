@@ -1,0 +1,209 @@
+{
+  "input_file": "C:\\MLOps Proyecto Final\\Grupo-3-Proyecto-Final-KDD-Cup-99\\data\\raw\\kddcup_10_percent.csv",
+  "n_rows": 494021,
+  "n_cols": 44,
+  "missing_values": {
+    "columns_with_nulls": {},
+    "total_null_cells": 0
+  },
+  "encoded_missing": {},
+  "duplicates": {
+    "duplicate_rows": 348435,
+    "duplicate_pct": 70.53
+  },
+  "inconsistent_records": {
+    "su_attempted_sin_evidencia_root": 2,
+    "land_attack_sin_bytes": 22
+  },
+  "incorrect_types": {},
+  "inconsistent_categories": {},
+  "invalid_dates": {
+    "applicable": false,
+    "reason": "dataset sin columna de timestamp"
+  },
+  "impossible_values": {},
+  "outliers": {
+    "src_bytes": {
+      "outliers": 4056,
+      "pct": 0.82
+    },
+    "dst_host_diff_srv_rate": {
+      "outliers": 10038,
+      "pct": 2.03
+    }
+  },
+  "cardinality": {
+    "protocol_type": 3,
+    "service": 66,
+    "flag": 11,
+    "label": 23,
+    "attack_category": 5
+  },
+  "skewness": {
+    "high_skew_columns": {
+      "src_bytes": 699.213151016901,
+      "urgent": 447.6470045092873,
+      "num_compromised": 417.5302280760385,
+      "num_root": 417.06583587003735,
+      "su_attempted": 230.97967703426062,
+      "num_file_creations": 192.33476568136973,
+      "num_failed_logins": 160.80261640432917,
+      "land": 149.84203812912185,
+      "dst_bytes": 136.7592782028145,
+      "num_shells": 108.87421764912442,
+      "root_shell": 94.75892907201643,
+      "num_access_files": 61.2014517179218,
+      "hot": 32.62914513841979,
+      "is_guest_login": 26.799333760900943,
+      "duration": 25.864857355894316,
+      "wrong_fragment": 21.718929171250572,
+      "dst_host_srv_diff_host_rate": 14.352580230110522,
+      "diff_srv_rate": 9.642426289694367,
+      "dst_host_diff_srv_rate": 6.85716845570239,
+      "srv_diff_host_rate": 5.869011189406132,
+      "dst_host_srv_rerror_rate": 3.80577391945485,
+      "srv_rerror_rate": 3.799986493766855,
+      "rerror_rate": 3.798979013829984,
+      "dst_host_rerror_rate": 3.7812948495958687
+    }
+  },
+  "unit_errors": {
+    "applicable": true,
+    "finding": "sin evidencia de mezcla de unidades"
+  },
+  "leakage": {
+    "derived_target_columns": [
+      "attack_category",
+      "is_anomaly",
+      "label"
+    ],
+    "features_ventana_2_segundos": [
+      "count",
+      "srv_count",
+      "serror_rate",
+      "srv_serror_rate",
+      "rerror_rate",
+      "srv_rerror_rate",
+      "same_srv_rate",
+      "diff_srv_rate",
+      "srv_diff_host_rate"
+    ],
+    "features_ventana_100_conexiones": [
+      "dst_host_count",
+      "dst_host_srv_count",
+      "dst_host_same_srv_rate",
+      "dst_host_diff_srv_rate",
+      "dst_host_same_src_port_rate",
+      "dst_host_srv_diff_host_rate",
+      "dst_host_serror_rate",
+      "dst_host_srv_serror_rate",
+      "dst_host_rerror_rate",
+      "dst_host_srv_rerror_rate"
+    ]
+  },
+  "imbalance": {
+    "attack_category_distribution": {
+      "dos": 391458,
+      "normal": 97278,
+      "probe": 4107,
+      "r2l": 1126,
+      "u2r": 52
+    }
+  },
+  "temporal_gaps": {
+    "applicable": false
+  },
+  "excessive_correlation": {
+    "high_correlation_pairs": [
+      [
+        "serror_rate",
+        "dst_host_serror_rate",
+        0.999
+      ],
+      [
+        "srv_serror_rate",
+        "dst_host_srv_serror_rate",
+        0.999
+      ],
+      [
+        "serror_rate",
+        "srv_serror_rate",
+        0.998
+      ],
+      [
+        "serror_rate",
+        "dst_host_srv_serror_rate",
+        0.998
+      ],
+      [
+        "srv_serror_rate",
+        "dst_host_serror_rate",
+        0.998
+      ],
+      [
+        "dst_host_serror_rate",
+        "dst_host_srv_serror_rate",
+        0.998
+      ],
+      [
+        "rerror_rate",
+        "srv_rerror_rate",
+        0.995
+      ],
+      [
+        "num_compromised",
+        "num_root",
+        0.994
+      ],
+      [
+        "rerror_rate",
+        "dst_host_rerror_rate",
+        0.987
+      ],
+      [
+        "srv_rerror_rate",
+        "dst_host_srv_rerror_rate",
+        0.987
+      ],
+      [
+        "rerror_rate",
+        "dst_host_srv_rerror_rate",
+        0.985
+      ],
+      [
+        "dst_host_rerror_rate",
+        "dst_host_srv_rerror_rate",
+        0.985
+      ],
+      [
+        "srv_rerror_rate",
+        "dst_host_rerror_rate",
+        0.982
+      ],
+      [
+        "dst_host_srv_count",
+        "dst_host_same_srv_rate",
+        0.974
+      ],
+      [
+        "srv_count",
+        "dst_host_same_src_port_rate",
+        0.945
+      ],
+      [
+        "count",
+        "srv_count",
+        0.944
+      ],
+      [
+        "same_srv_rate",
+        "dst_host_same_srv_rate",
+        0.928
+      ]
+    ]
+  },
+  "statistical_anomalies": {
+    "extreme_rows": 21895,
+    "extreme_pct": 4.43
+  }
+}
