@@ -1,7 +1,5 @@
 # Grupo-3-Proyecto-Final-KDD-Cup-99
 
-# Grupo-3-Proyecto-Final-KDD-Cup-99
-
 ## Historia del Dataset
 Es un dataset bastante antiguo que nacio en la epoca de los 90 especificamente 1998, la agencia DARPA encomendo una tarea y esa tarea era evaluar y mejorar los sistemas de detección de intrusos y por eso nacio el dataset que fue una simulación de una red militar que diferentes tipos de conexiones en 9 semanas de todo tipo de conexiones y el objetivo era generar la mayor seguridad posible para que no existan hackeos.
 
