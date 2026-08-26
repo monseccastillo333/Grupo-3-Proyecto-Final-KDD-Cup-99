@@ -8,18 +8,6 @@
       "duplicados_en_ataques": "conservados (patrón real de tráfico)"
     },
     {
-      "step": "2. Imbalance de clases (solo diagnóstico, sin resampling aquí)",
-      "conteo_por_clase": {
-        "dos": 391458,
-        "normal": 87832,
-        "probe": 4107,
-        "r2l": 1126,
-        "u2r": 52
-      },
-      "ratio_max_min": 7528.0,
-      "decisión": "class_weight='balanced' se aplica en modelado (Sección J/K), no en este script de limpieza"
-    },
-    {
       "step": "3. Columnas correlacionadas eliminadas (r > 0.9)",
       "eliminadas": [
         "serror_rate",
@@ -36,55 +24,6 @@
       ]
     },
     {
-      "step": "4. service -> target/frequency encoding",
-      "columna_nueva": "service_anomaly_rate",
-      "categorias_originales": 66,
-      "servicios_con_100pct_anomalia": [
-        "Z39_50",
-        "bgp",
-        "courier",
-        "csnet_ns",
-        "ctf",
-        "daytime",
-        "discard",
-        "echo",
-        "efs",
-        "exec",
-        "gopher",
-        "hostnames",
-        "http_443",
-        "imap4",
-        "iso_tsap",
-        "klogin",
-        "kshell",
-        "ldap",
-        "link",
-        "login",
-        "mtp",
-        "name",
-        "netbios_dgm",
-        "netbios_ns",
-        "netbios_ssn",
-        "netstat",
-        "nnsp",
-        "nntp",
-        "pm_dump",
-        "pop_2",
-        "printer",
-        "remote_job",
-        "rje",
-        "sql_net",
-        "sunrpc",
-        "supdup",
-        "systat",
-        "uucp",
-        "uucp_path",
-        "vmnet",
-        "whois"
-      ],
-      "limitacion_documentada": "Tasa de 100% en servicios poco comunes refleja el diseño del entorno simulado (McHugh, 2000), no causalidad real. Documentar en el informe técnico; no depender excesivamente de esta señal sin mencionar la limitación."
-    },
-    {
       "step": "5. Transformación log1p (skewness extrema)",
       "columnas_originales_conservadas": [
         "src_bytes",
@@ -94,45 +33,7 @@
         "src_bytes_log",
         "dst_bytes_log"
       ],
-      "uso": "usar *_log en modelos lineales/distancia; usar originales en modelos de árboles"
-    },
-    {
-      "step": "6. Columnas excluidas de X (leakage directo del target)",
-      "excluidas_de_features": [
-        "label",
-        "attack_category",
-        "is_anomaly"
-      ],
-      "uso": "label/attack_category/is_anomaly solo como fuente de y, nunca como columnas de entrada al modelo",
-      "n_features_resultantes": 39
-    },
-    {
-      "step": "7. Columnas de ventana temporal (no se limpian, prioridad de diseño)",
-      "ventana_2_segundos_presentes": [
-        "count",
-        "srv_count",
-        "same_srv_rate",
-        "diff_srv_rate",
-        "srv_diff_host_rate"
-      ],
-      "ventana_100_conexiones_presentes": [
-        "dst_host_count",
-        "dst_host_srv_count",
-        "dst_host_same_srv_rate",
-        "dst_host_diff_srv_rate",
-        "dst_host_same_src_port_rate",
-        "dst_host_srv_diff_host_rate",
-        "dst_host_serror_rate",
-        "dst_host_srv_serror_rate",
-        "dst_host_rerror_rate",
-        "dst_host_srv_rerror_rate"
-      ],
-      "nota": "count (r=0.75) y srv_count (r=0.57) son las features más discriminativas del EDA; deben recalcularse de forma IDÉNTICA en el API de inferencia (Sección M) — prioridad de diseño por encima de otras transformaciones."
-    },
-    {
-      "step": "8. Verificaciones que salieron limpias en calidad de datos",
-      "nan_tras_limpieza": 0,
-      "nota": "NaN, faltantes codificados, tipos de datos, categorías fuera de dominio y datos imposibles ya se verificaron limpios en Data Quality (Sección F); no requieren transformación adicional aquí."
+      "uso": "usar *_log en modelos lineales/distancia; usar originales en árboles"
     },
     {
       "step": "9. Columnas constantes eliminadas",
@@ -152,82 +53,50 @@
       "valor(es)_inesperado(s)": [
         2
       ],
-      "decisión": "agrupado junto con 1 en 'su_attempted_grouped' (ambos indican intento de 'su root'); 'su_attempted' original se conserva sin modificar"
+      "decisión": "agrupado junto con 1 en 'su_attempted_grouped' (ambos indican intento de 'su root')"
+    },
+    {
+      "step": "2. Imbalance de clases (solo diagnóstico, sin resampling aquí)",
+      "conteo_por_clase": {
+        "dos": 391458,
+        "normal": 87832,
+        "probe": 4107,
+        "r2l": 1126,
+        "u2r": 52
+      },
+      "ratio_max_min": 7528.0,
+      "decisión": "class_weight='balanced' se aplica en modelado (Sección J/K), no en limpieza"
+    },
+    {
+      "step": "7. Columnas de ventana temporal (prioridad de diseño)",
+      "ventana_2_segundos_presentes": [
+        "count",
+        "srv_count",
+        "same_srv_rate"
+      ],
+      "nota": "Features discriminativas del EDA; deben mantenerse consistentes en inferencia"
+    },
+    {
+      "step": "8. Verificaciones de calidad de datos",
+      "nan_tras_limpieza": 0,
+      "nota": "Datos sin valores faltantes ni inconsistencias estructurales"
+    },
+    {
+      "step": "6. Columnas excluidas de X (leakage directo del target)",
+      "excluidas_de_features": [
+        "label",
+        "attack_category",
+        "is_anomaly"
+      ],
+      "n_features_resultantes": 37
     }
   ],
   "resumen": {
     "filas_finales": 484575,
-    "columnas_finales": 41,
-    "n_features_finales": 38,
-    "csv_salida": "data\\processed\\kddcup_10_percent_clean.csv"
-  },
-  "service_anomaly_rate_map": {
-    "IRC": 0.023255813953488372,
-    "X11": 0.18181818181818182,
-    "Z39_50": 1.0,
-    "auth": 0.32926829268292684,
-    "bgp": 1.0,
-    "courier": 1.0,
-    "csnet_ns": 1.0,
-    "ctf": 1.0,
-    "daytime": 1.0,
-    "discard": 1.0,
-    "domain": 0.9741379310344828,
-    "domain_u": 0.00018433179723502304,
-    "echo": 1.0,
-    "eco_i": 0.8303512259774686,
-    "ecr_i": 0.9993706263867554,
-    "efs": 1.0,
-    "exec": 1.0,
-    "finger": 0.30149253731343284,
-    "ftp": 0.5325814536340853,
-    "ftp_data": 0.19555084745762713,
-    "gopher": 1.0,
-    "hostnames": 1.0,
-    "http": 0.03803128456312214,
-    "http_443": 1.0,
-    "imap4": 1.0,
-    "iso_tsap": 1.0,
-    "klogin": 1.0,
-    "kshell": 1.0,
-    "ldap": 1.0,
-    "link": 1.0,
-    "login": 1.0,
-    "mtp": 1.0,
-    "name": 1.0,
-    "netbios_dgm": 1.0,
-    "netbios_ns": 1.0,
-    "netbios_ssn": 1.0,
-    "netstat": 1.0,
-    "nnsp": 1.0,
-    "nntp": 1.0,
-    "ntp_u": 0.0,
-    "other": 0.2845744680851064,
-    "pm_dump": 1.0,
-    "pop_2": 1.0,
-    "pop_3": 0.6119402985074627,
-    "printer": 1.0,
-    "private": 0.9860653395561482,
-    "red_i": 0.0,
-    "remote_job": 1.0,
-    "rje": 1.0,
-    "shell": 0.9910714285714286,
-    "smtp": 0.012856114367993417,
-    "sql_net": 1.0,
-    "ssh": 0.9904761904761905,
-    "sunrpc": 1.0,
-    "supdup": 1.0,
-    "systat": 1.0,
-    "telnet": 0.5730994152046783,
-    "tftp_u": 0.0,
-    "tim_i": 0.7142857142857143,
-    "time": 0.75,
-    "urh_i": 0.0,
-    "urp_i": 0.002257336343115124,
-    "uucp": 1.0,
-    "uucp_path": 1.0,
-    "vmnet": 1.0,
-    "whois": 1.0
+    "columnas_finales": 40,
+    "n_features_finales": 37,
+    "csv_salida": "data\\processed\\kddcup_10_percent_clean.csv",
+    "pipeline_joblib": "models\\feature_pipeline.joblib"
   },
   "feature_columns_final": [
     "duration",
@@ -264,7 +133,6 @@
     "dst_host_srv_serror_rate",
     "dst_host_rerror_rate",
     "dst_host_srv_rerror_rate",
-    "service_anomaly_rate",
     "src_bytes_log",
     "dst_bytes_log",
     "su_attempted_grouped"
