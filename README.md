@@ -1,29 +1,5 @@
 # Grupo-3-Proyecto-Final-KDD-Cup-99
 
-## Historia del Dataset
-Es un dataset bastante antiguo que nacio en la epoca de los 90 especificamente 1998, la agencia DARPA encomendo una tarea y esa tarea era evaluar y mejorar los sistemas de detección de intrusos y por eso nacio el dataset que fue una simulación de una red militar que diferentes tipos de conexiones en 9 semanas de todo tipo de conexiones y el objetivo era generar la mayor seguridad posible para que no existan hackeos.
-
-## Problema del Negocio
-Se busca que el sistema pueda detectar miles de conexiones por segundos y que esas conexiones si se detecta que no es segura que se bloquee o limite para evitar riesgos, practicamente que el modelo sea capas de reconocer las conexiones y pueda disernir cuales son anormales.
-
-## Dataset
-el dataset es de un registro de 4 millones que se cuenta con 41 columnas predictorias y 1 etiqueta de label que es definición si es segura o riesgosa esa conexión
-
-## Ingesta
-Para iniciar puedes revisar la ruta src en la carpeta ingestion y para correr el codigo seria `py src/ingestion/ingest.py`
-se procedera a realizar la descarga del dataset y se creara una ruta llamada data/raw y se encontrara el csv para ejecutar demas archivos python.
-
-## Validación
-La validación para este caso es en la ruta src/validation y estara un archivo llamado ingest.py y para correr el codigo seria `py src/validation/validate.py` y ejecutara 5 reglas que serian las siguientes:
-
-- Dataset no vacío
-- Mínimo de filas esperada 490k
-- Cantidad exacta de columnas esperadas 42
-- Presencia de la columna objetivo 'label'
-- Umbral máximo de duplicados masivos menor al 90%
-
-Si se cumplen cada regla, tirara un "PASS" que significa que el dataset esta perfecto y funcional.
-
 
 ## Data Quality (Sección F)
 
@@ -273,3 +249,31 @@ es un error de la ingesta. Feature Engineering debe decidir explícitamente
 cómo tratar el tercer valor (por ejemplo, agruparlo junto con 1, ya que
 ambos indican que sí hubo un intento de "su root", o mantenerlo como
 categoría aparte) y documentar esa decisión.
+
+
+M
+## MLflow — Tracking de modelos existentes
+
+El entrenamiento ya realizado se puede importar en MLflow sin volver a
+entrenar los modelos. El importador registra un run por modelo, sus
+hiperparámetros, `feature_set`, semilla, versión SHA-256 del dataset y del
+código, métricas, matriz de confusión, gráficos, configuración y el modelo
+registrado.
+
+si no tiene instalado mlflow se ejecuta `python -m pip install mlflow`
+
+Desde la raíz del proyecto, ejecutar una sola vez:
+
+```powershell
+python -m src.tracking.log_existing_models
+```
+
+Esto crea `mlflow.db` localmente y es idempotente: si un modelo ya fue
+importado, no crea otro run. Para abrir la interfaz:
+
+```powershell
+python -m mlflow ui --backend-store-uri sqlite:///mlflow.db
+```
+
+Los archivos `.joblib` y los reportes JSON originales se conservan como
+fuente de auditoría.
