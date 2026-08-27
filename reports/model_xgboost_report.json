@@ -1,0 +1,18 @@
+{
+  "run_name": "xgboost",
+  "algorithm": "XGBClassifier",
+  "parameters": {
+    "n_estimators": 100,
+    "scale_pos_weight": 1.5334133566128327,
+    "random_state": 42
+  },
+  "metrics": {
+    "auc": 0.9999987973274629,
+    "recall_dos": 1.0,
+    "recall_normal": 0.9999,
+    "recall_probe": 0.995,
+    "recall_r2l": 0.9705,
+    "recall_u2r": 0.6364
+  },
+  "model_path": "models/xgboost.joblib"
+}

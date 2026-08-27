@@ -1,0 +1,18 @@
+{
+  "run_name": "random_forest",
+  "algorithm": "RandomForestClassifier",
+  "parameters": {
+    "n_estimators": 100,
+    "class_weight": "balanced",
+    "random_state": 42
+  },
+  "metrics": {
+    "auc": 0.9999989041764693,
+    "recall_dos": 1.0,
+    "recall_normal": 0.9999,
+    "recall_probe": 0.995,
+    "recall_r2l": 0.9789,
+    "recall_u2r": 0.6364
+  },
+  "model_path": "models/random_forest.joblib"
+}

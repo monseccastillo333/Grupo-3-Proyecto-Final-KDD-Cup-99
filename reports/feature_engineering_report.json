@@ -1,13 +1,6 @@
 {
   "steps": [
     {
-      "step": "1. Duplicados (solo dentro de 'normal')",
-      "filas_antes": 494021,
-      "filas_normal_duplicadas_eliminadas": 9446,
-      "filas_despues": 484575,
-      "duplicados_en_ataques": "conservados (patrón real de tráfico)"
-    },
-    {
       "step": "3. Columnas correlacionadas eliminadas (r > 0.9)",
       "eliminadas": [
         "serror_rate",
@@ -58,13 +51,13 @@
     {
       "step": "2. Imbalance de clases (solo diagnóstico, sin resampling aquí)",
       "conteo_por_clase": {
-        "dos": 391458,
         "normal": 87832,
-        "probe": 4107,
-        "r2l": 1126,
+        "dos": 54572,
+        "probe": 2131,
+        "r2l": 999,
         "u2r": 52
       },
-      "ratio_max_min": 7528.0,
+      "ratio_max_min": 1689.1,
       "decisión": "class_weight='balanced' se aplica en modelado (Sección J/K), no en limpieza"
     },
     {
@@ -92,7 +85,7 @@
     }
   ],
   "resumen": {
-    "filas_finales": 484575,
+    "filas_finales": 145586,
     "columnas_finales": 40,
     "n_features_finales": 37,
     "csv_salida": "data\\processed\\kddcup_10_percent_clean.csv",
