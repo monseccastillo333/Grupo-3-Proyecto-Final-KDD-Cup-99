@@ -9,10 +9,10 @@
   "metrics": {
     "auc": 0.9999989041764693,
     "recall_dos": 1.0,
-    "recall_normal": 0.9999,
-    "recall_probe": 0.995,
-    "recall_r2l": 0.9789,
-    "recall_u2r": 0.6364
+    "recall_normal": 0.9995445747466697,
+    "recall_probe": 0.9946949602122016,
+    "recall_r2l": 0.9852941176470589,
+    "recall_u2r": 0.8125
   },
-  "model_path": "models/random_forest.joblib"
+  "model_path": "models\\random_forest.joblib"
 }
