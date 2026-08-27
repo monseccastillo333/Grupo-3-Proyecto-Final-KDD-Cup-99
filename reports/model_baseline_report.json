@@ -4,15 +4,15 @@
   "parameters": {
     "class_weight": "balanced",
     "max_iter": 1000,
-    "random_seed": 42
+    "random_state": 42
   },
   "metrics": {
     "auc": 0.9981109890823674,
-    "recall_dos": 0.9997,
-    "recall_normal": 0.998,
-    "recall_probe": 0.9127,
-    "recall_r2l": 0.4177,
-    "recall_u2r": 0.2727
+    "recall_dos": 0.9994474120464174,
+    "recall_normal": 0.9917454172833884,
+    "recall_probe": 0.8938992042440318,
+    "recall_r2l": 0.8578431372549019,
+    "recall_u2r": 0.625
   },
-  "model_path": "models/baseline_logistic_regression.joblib"
+  "model_path": "models\\baseline_logistic_regression.joblib"
 }

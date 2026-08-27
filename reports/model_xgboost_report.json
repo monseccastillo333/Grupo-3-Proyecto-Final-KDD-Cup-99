@@ -9,10 +9,10 @@
   "metrics": {
     "auc": 0.9999987973274629,
     "recall_dos": 1.0,
-    "recall_normal": 0.9999,
-    "recall_probe": 0.995,
-    "recall_r2l": 0.9705,
-    "recall_u2r": 0.6364
+    "recall_normal": 0.9997153592166685,
+    "recall_probe": 0.9946949602122016,
+    "recall_r2l": 0.9901960784313726,
+    "recall_u2r": 0.9375
   },
-  "model_path": "models/xgboost.joblib"
+  "model_path": "models\\xgboost.joblib"
 }
