@@ -1,8 +1,6 @@
 # Grupo-3-Proyecto-Final-KDD-Cup-99
 
 
-
-
 ## Data Quality (Sección F)
 
 **Script:** `src/quality/data_quality_report.py`
@@ -251,3 +249,31 @@ es un error de la ingesta. Feature Engineering debe decidir explícitamente
 cómo tratar el tercer valor (por ejemplo, agruparlo junto con 1, ya que
 ambos indican que sí hubo un intento de "su root", o mantenerlo como
 categoría aparte) y documentar esa decisión.
+
+
+M
+## MLflow — Tracking de modelos existentes
+
+El entrenamiento ya realizado se puede importar en MLflow sin volver a
+entrenar los modelos. El importador registra un run por modelo, sus
+hiperparámetros, `feature_set`, semilla, versión SHA-256 del dataset y del
+código, métricas, matriz de confusión, gráficos, configuración y el modelo
+registrado.
+
+si no tiene instalado mlflow se ejecuta `python -m pip install mlflow`
+
+Desde la raíz del proyecto, ejecutar una sola vez:
+
+```powershell
+python -m src.tracking.log_existing_models
+```
+
+Esto crea `mlflow.db` localmente y es idempotente: si un modelo ya fue
+importado, no crea otro run. Para abrir la interfaz:
+
+```powershell
+python -m mlflow ui --backend-store-uri sqlite:///mlflow.db
+```
+
+Los archivos `.joblib` y los reportes JSON originales se conservan como
+fuente de auditoría.
