@@ -265,7 +265,7 @@ si no tiene instalado mlflow se ejecuta `python -m pip install mlflow`
 Desde la raíz del proyecto, ejecutar una sola vez:
 
 ```powershell
-python -m src.tracking.log_existing_models
+python -m src.tracking.cargamlflow
 ```
 
 Esto crea `mlflow.db` localmente y es idempotente: si un modelo ya fue
