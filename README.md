@@ -277,3 +277,30 @@ python -m mlflow ui --backend-store-uri sqlite:///mlflow.db
 
 Los archivos `.joblib` y los reportes JSON originales se conservan como
 fuente de auditoría.
+
+
+## API
+
+archivo creado en src/api/main.py
+
+- pip install uvicorn
+
+- python -m uvicorn src.api.main:app --reload --port 8000
+
+- http://127.0.0.1:8000/docs#/
+
+
+## Docker
+
+archivos creados: Dockerfile, requirements.txt 
+
+- docker build -t grupo-mlops-kdd99 .
+
+- docker run -p 8000:8000 --name kdd99-service grupo-mlops-kdd99
+
+
+## Pruebas
+
+- pip install pytest httpx
+
+- python -m pytest -q
