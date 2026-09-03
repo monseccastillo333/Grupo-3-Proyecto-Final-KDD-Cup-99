@@ -1,0 +1,37 @@
+{
+    "status": "FAILED",
+    "action": "BLOCKED_BATCH",
+    "total_incidents": 6,
+    "incidents": [
+        {
+            "type": "SCHEMA_MODIFICATION",
+            "detail": "Columnas inesperadas: ['unexpected_column']",
+            "severity": "MEDIUM"
+        },
+        {
+            "type": "DUPLICATED_ROWS",
+            "detail": "Se encontraron 1 filas duplicadas",
+            "severity": "LOW"
+        },
+        {
+            "type": "MISSING_VALUES",
+            "detail": "Columna 'duration' tiene 1 valores nulos",
+            "severity": "MEDIUM"
+        },
+        {
+            "type": "UNKNOWN_CATEGORY",
+            "detail": "Fila 4, 'protocol_type' contiene categor\u00eda no registrada: UNKNOWN_PROTOCOL",
+            "severity": "HIGH"
+        },
+        {
+            "type": "EXTREME_OUTLIER",
+            "detail": "Fila 2, 'src_bytes' con valor fuera de rango: -999999",
+            "severity": "HIGH"
+        },
+        {
+            "type": "INCORRECT_DATATYPE",
+            "detail": "Fila 3, 'count' esperaba tipo num\u00e9rico pero recibi\u00f3: tres",
+            "severity": "HIGH"
+        }
+    ]
+}

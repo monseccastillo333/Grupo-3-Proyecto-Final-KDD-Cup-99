@@ -1,0 +1,44 @@
+{
+    "PRODUCTION BATCH 1": {
+        "duration": {
+            "PSI": 0.0108,
+            "status": "OK"
+        },
+        "src_bytes": {
+            "PSI": 0.0241,
+            "status": "OK"
+        },
+        "dst_bytes": {
+            "PSI": 0.0102,
+            "status": "OK"
+        }
+    },
+    "PRODUCTION BATCH 2": {
+        "duration": {
+            "PSI": 0.2732,
+            "status": "ALERT"
+        },
+        "src_bytes": {
+            "PSI": 0.5798,
+            "status": "ALERT"
+        },
+        "dst_bytes": {
+            "PSI": 0.4614,
+            "status": "ALERT"
+        }
+    },
+    "PRODUCTION BATCH 3": {
+        "duration": {
+            "PSI": 1.4635,
+            "status": "ALERT"
+        },
+        "src_bytes": {
+            "PSI": 6.3167,
+            "status": "ALERT"
+        },
+        "dst_bytes": {
+            "PSI": 5.9112,
+            "status": "ALERT"
+        }
+    }
+}

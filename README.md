@@ -304,3 +304,15 @@ archivos creados: Dockerfile, requirements.txt
 - pip install pytest httpx
 
 - python -m pytest -q
+
+## Monitoring 
+
+- python -m src.monitoring.monitor
+
+## Simulación de producción y DRIFT
+
+- python -m src.monitoring.simulate_drift
+
+## Simulación obligatoria de problemas de calidad
+
+- python "src/quality simulation/simulate_quality_issues.py"
