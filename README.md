@@ -1,5 +1,70 @@
 # Grupo-3-Proyecto-Final-KDD-Cup-99
 
+## Instalación
+
+Requiere Python 3.10+ instalado.
+
+```powershell
+# Clonar el repositorio y entrar a la carpeta del proyecto
+git clone <URL-del-repositorio>
+cd Grupo-3-Proyecto-Final-KDD-Cup-99
+
+# (Opcional pero recomendado) crear entorno virtual
+py -m venv venv
+venv\Scripts\Activate.ps1
+
+# Instalar dependencias
+pip install -r requirements.txt
+```
+
+Si `Activate.ps1` está bloqueado por la política de ejecución de PowerShell,
+se puede omitir el entorno virtual y usar directamente `py -m pip install`,
+o ejecutar el proyecto llamando siempre al Python del venv por ruta completa
+(`venv\Scripts\python.exe`).
+
+## Orden de ejecución completo (pipeline end-to-end)
+
+Todos los comandos se ejecutan desde la raíz del proyecto
+(`Grupo-3-Proyecto-Final-KDD-Cup-99`).
+
+```powershell
+# 1. Ingesta de datos
+python src/ingestion/ingest.py
+
+# 2. Data Quality Gates (validación automática, falla si algo no cumple el mínimo)
+python src/validation/validate.py
+
+# 3. Limpieza y Feature Engineering (genera el dataset limpio y el pipeline compartido)
+python -m src.preprocessing.Limpieza_transformacion
+
+# 4. Entrenamiento y evaluación de modelos
+python -m src.training.train
+
+# 5. Registro en MLflow
+python -m src.tracking.cargamlflow
+
+# 6. Pruebas automatizadas
+python -m pytest -q
+
+Archivos de prueba:
+- `test_data.py` — esquema, tipos, nulos y rangos del dataset procesado.
+- `test_model.py` — validez de predicciones (rango [0,1]) y determinismo
+  del modelo (misma entrada → misma salida).
+- `test_api.py` — endpoint `/health`, contrato de respuesta de `/predict`
+  con input válido (HTTP 200) y rechazo de input inválido (HTTP 422).
+
+# 7. Levantar la API
+python -m uvicorn src.api.main:app --reload --port 8000
+
+- http://127.0.0.1:8000/docs#/
+
+# 8. Monitoreo y simulación de drift (con la API corriendo o de forma independiente)
+python -m src.monitoring.monitoring
+python -m src.monitoring.simulate_drift
+
+# 9. Simulación de problemas de calidad
+python "src/quality simulation/simulate_quality_issues.py"
+
 
 ## Data Quality (Sección F)
 
@@ -250,6 +315,131 @@ cómo tratar el tercer valor (por ejemplo, agruparlo junto con 1, ya que
 ambos indican que sí hubo un intento de "su root", o mantenerlo como
 categoría aparte) y documentar esa decisión.
 
+## Data Quality Gates (Sección G)
+
+**Script:** `src/validation/validate.py`
+
+Antes de entrenar, el pipeline valida automáticamente que el dataset crudo
+cumpla un mínimo de condiciones. Si alguna falla, el script se detiene con
+un `AssertionError` — el entrenamiento no debe continuar con datos que no
+pasen estas reglas.
+
+### Cómo ejecutarlo
+
+```powershell
+python src/validation/validate.py
+```
+
+### Reglas implementadas (5, mínimo exigido por la Sección G)
+
+| # | Regla | Umbral |
+|---|---|---|
+| 1 | El archivo crudo existe y no está vacío | `shape[0] > 0` |
+| 2 | Volumen mínimo de filas | `>= 100,000` filas |
+| 3 | Esquema válido (número de columnas) | exactamente 42 columnas |
+| 4 | Presencia de la columna objetivo | `label` debe existir |
+| 5 | Tasa de duplicados no catastrófica | `< 90%` |
+
+Nota: el umbral de duplicados (90%) es deliberadamente holgado respecto al
+70.06% real detectado en el diagnóstico de calidad — esta regla protege
+contra una corrupción grave del archivo fuente, no reemplaza la
+deduplicación que se aplica más adelante en Feature Engineering.
+
+## Feature Engineering (Sección I)
+
+**Script principal:** `src/preprocessing/Limpieza_transformacion.py`
+**Clases de transformación (importables):** `src/preprocessing/transformers.py`
+
+Este script integra en un único `sklearn.Pipeline` todas las
+transformaciones de limpieza aplicadas al dataset, y garantiza que la misma
+lógica se pueda usar tanto en entrenamiento como en inferencia (Sección M).
+
+### Cómo ejecutarlo
+
+```powershell
+py -m src.preprocessing.Limpieza_transformacion
+```
+
+Se ejecuta con `-m` (no llamando al archivo por ruta directa) porque el
+script importa `src.preprocessing.transformers` como parte del paquete del
+proyecto.
+
+### Qué hace
+
+1. Carga el CSV crudo (`data/raw/kddcup_10_percent.csv`) y deriva
+   `attack_category`/`is_anomaly` si no existen.
+2. Aplica, en este orden, el pipeline de transformación:
+   - `DeduplicateGlobal` — elimina duplicados exactos sobre todo el dataset.
+   - `DropCorrelatedColumns` — elimina columnas con r > 0.9 (conserva
+     `dst_host_serror_rate`, `dst_host_rerror_rate`, `num_compromised`).
+   - `LogTransformer` — aplica `log1p` a `src_bytes`/`dst_bytes`.
+   - `DropConstantColumns` — elimina `num_outbound_cmds` e `is_host_login`.
+   - `SuAttemptedGrouper` — agrupa el valor inesperado de `su_attempted`.
+3. Guarda el dataset limpio en `data/processed/kddcup_10_percent_clean.csv`.
+4. Serializa el pipeline ya ajustado en `models/feature_pipeline.joblib`
+   (usado también por la API de inferencia, ver Sección M).
+5. Exporta el detalle de cada paso en `reports/feature_engineering_report.json`.
+
+**Nota de diseño importante:** las clases de transformación viven en
+`transformers.py`, no dentro del script ejecutable — esto es necesario para
+que el archivo `.joblib` se pueda cargar correctamente desde cualquier otro
+punto del proyecto (el notebook de modelado, `train.py`, o la API). Si las
+clases se definieran dentro de `Limpieza_transformacion.py`, joblib no
+podría deserializarlas fuera de ese mismo script.
+
+**Nota de reproducibilidad conocida:** existe una discrepancia menor
+(~0.33% de las filas) entre la deduplicación aplicada en memoria por este
+pipeline y la que resulta de recargar el CSV ya persistido, atribuible a
+pérdida de precisión decimal al guardar valores `float64` como texto plano.
+Ver el informe técnico de modelado, Sección 5, para el detalle completo.
+
+## Entrenamiento y Modelado (Secciones J y K)
+
+**Script:** `src/training/train.py`
+
+Entrena y evalúa los tres modelos de producción sobre el dataset ya
+limpio, usando el mismo criterio de features en los tres.
+
+### Requisito previo
+
+Debe haberse ejecutado antes el paso de Feature Engineering (sección
+anterior), ya que este script consume
+`data/processed/kddcup_10_percent_clean.csv`.
+
+### Cómo ejecutarlo
+
+```powershell
+py -m src.training.train
+```
+
+### Qué hace
+
+1. Carga el dataset limpio y verifica que no queden duplicados (si
+   encuentra alguno, lo reporta como advertencia — ver nota de
+   reproducibilidad de la sección anterior).
+2. Divide en entrenamiento/prueba (80/20, estratificado por `is_anomaly`).
+3. Ajusta un codificador de tasa de anomalía por `service`
+   (`ServiceTargetEncoder`), entrenado solo con el conjunto de
+   entrenamiento para evitar leakage.
+4. Aplica one-hot encoding a `protocol_type` y `flag`, y alinea las
+   columnas entre train y test.
+5. Entrena y evalúa, en orden: Regresión Logística (baseline), Random
+   Forest, y XGBoost base.
+6. Guarda cada modelo (`models/*.joblib`) y su reporte de parámetros y
+   métricas (`reports/model_*_report.json`), junto con el `scaler` y el
+   codificador de servicio usados.
+
+### Modelo seleccionado
+
+**XGBoost base**, sin ajuste de hiperparámetros. El criterio explícito de
+selección es el recall en la categoría `u2r` (escalación de privilegios,
+la clase más rara y de mayor severidad), donde XGBoost base obtiene 93.75%
+frente a 81.25% de Random Forest y de las versiones con tuning automático.
+El detalle completo de los 5 experimentos, incluyendo por qué el ajuste
+automático de hiperparámetros no mejoró el resultado, está en el informe
+técnico de modelado (`Informe_Tecnico_Modelado.docx`).
+
+
 
 M
 ## MLflow — Tracking de modelos existentes
@@ -260,7 +450,7 @@ hiperparámetros, `feature_set`, semilla, versión SHA-256 del dataset y del
 código, métricas, matriz de confusión, gráficos, configuración y el modelo
 registrado.
 
-si no tiene instalado mlflow se ejecuta `python -m pip install mlflow`
+si no tiene instalado mlflow se ejecuta `python -m pip install mlflow` o  `python -m pip install xgboost` o `pip install anyio`
 
 Desde la raíz del proyecto, ejecutar una sola vez:
 
@@ -307,7 +497,7 @@ archivos creados: Dockerfile, requirements.txt
 
 ## Monitoring 
 
-- python -m src.monitoring.monitor
+- python -m src.monitoring.monitoring
 
 ## Simulación de producción y DRIFT
 

@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import pytest
 
-DATA_PATH = "data/processed/clean_kdd99.csv"
+DATA_PATH = "data/processed/kddcup_10_percent_clean.csv"
 
 
 @pytest.fixture
