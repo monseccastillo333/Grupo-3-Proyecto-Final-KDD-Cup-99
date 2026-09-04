@@ -66,36 +66,36 @@ python -m src.monitoring.simulate_drift
 python "src/quality simulation/simulate_quality_issues.py"
 
 
-## Data Quality (Sección F)
+## Data Quality (Sección F) y EDA (Sección H)
 
-**Script:** `src/quality/data_quality_report.py`
-**Versión exploratoria por celdas (VS Code):** `src/quality/data_quality_report_interactive.py`
+**Notebook:** `src/quality & EDA/data quality & EDA.ipynb`
 **Reporte generado:** `reports/data_quality_report.json`
+**Figuras generadas:** `reports/figures/`
 
 ### Cómo ejecutarlo
 
-```powershell
-python src/quality/data_quality_report.py
-```
+Abrir el notebook en VS Code o Jupyter y ejecutar todas las celdas en
+orden (no requiere argumentos: detecta automáticamente la raíz del
+proyecto y busca `data/raw/kddcup_10_percent.csv`). Si el CSV no incluye
+una columna `attack_category`, el notebook la deriva en memoria a partir
+de `label`, sin modificar el archivo fuente.
 
-No requiere argumentos: detecta automáticamente la raíz del proyecto y busca
-`data/raw/kddcup_10_percent.csv`. Si el CSV no incluye una columna
-`attack_category` (por ejemplo, si se generó con
-`sklearn.datasets.fetch_kddcup99` en vez del script de ingesta propio), el
-script la deriva en memoria a partir de `label`, sin modificar el archivo
-fuente.
+Este notebook combina en un solo flujo el diagnóstico de calidad de datos
+(Sección F) y el análisis exploratorio (Sección H), ya que ambos procesos
+comparten la misma carga de datos y se complementan directamente: cada
+hallazgo de calidad se profundiza con una visualización correspondiente.
 
-### Qué cubre
+### Qué cubre — Calidad de datos
 
-El script implementa los 17 puntos de diagnóstico exigidos en la Sección F
-del proyecto: valores faltantes, faltantes codificados, duplicados,
-inconsistencias lógicas, tipos de datos, categorías fuera de dominio,
-fechas inválidas, datos imposibles, outliers, cardinalidad, skewness,
-errores de unidad, leakage, imbalance, gaps temporales, correlación
-excesiva y anomalías estadísticas. Cada hallazgo se imprime junto con su
-justificación — el script diagnostica, no limpia ni transforma los datos.
+Los 17 puntos de diagnóstico exigidos en la Sección F: valores faltantes,
+faltantes codificados, duplicados, inconsistencias lógicas, tipos de
+datos, categorías fuera de dominio, fechas inválidas, datos imposibles,
+outliers, cardinalidad, skewness, errores de unidad, leakage, imbalance,
+gaps temporales, correlación excesiva y anomalías estadísticas. Cada
+hallazgo se documenta junto con su justificación — este bloque diagnostica,
+no limpia ni transforma los datos.
 
-### Hallazgos principales (sobre el 10% del dataset, 494,021 filas)
+### Hallazgos principales de calidad (sobre el 10% del dataset, 494,021 filas)
 
 | Hallazgo | Resultado | Implicación |
 |---|---|---|
@@ -112,22 +112,11 @@ justificación — el script diagnostica, no limpia ni transforma los datos.
 - **Inconsistencia de nombre entre fuentes oficiales**: `kddcup.names` llama a una columna `is_host_login`, mientras que el paper original (`task.html`) la llama `is_hot_login` (relacionada con la lista de indicadores "hot"). Se documenta como ejemplo de inconsistencia de categorías/nombres entre fuentes del mismo dataset.
 - **Dos ventanas de cálculo distintas conviven en el dataset**: las columnas de la Tabla 3 (`count`, `*_rate`) usan una ventana de 2 segundos; las columnas `dst_host_*` usan una ventana de las últimas 100 conexiones al mismo host. Ambas deben poder recalcularse igual en producción.
 
+### Qué cubre — EDA
 
-## EDA — Análisis Exploratorio de Datos (Sección H)
-
-**Script:** `src/eda/eda_kdd.py`
-**Versión exploratoria por celdas (VS Code):** `src/eda/eda_kdd_interactive.py`
-**Figuras generadas:** `reports/figures/`
-
-### Cómo ejecutarlo
-
-```powershell
-python src/eda/eda_kdd.py
-```
-
-Se ejecuta sobre el dataset crudo (`data/raw/kddcup_10_percent.csv`), antes
-de la limpieza de Feature Engineering — el propósito del EDA es informar
-esas decisiones, no depender de un dataset ya transformado.
+Se ejecuta sobre el dataset crudo, antes de la limpieza de Feature
+Engineering — el propósito del EDA es informar esas decisiones, no
+depender de un dataset ya transformado.
 
 ### Hallazgos y decisiones que cambian
 
@@ -152,15 +141,16 @@ servicios inusuales) — es una limitación **documentada en la literatura**
 real de ciberseguridad. Un modelo que dependa demasiado de esta señal podría
 generalizar mal fuera de este dataset específico.
 
-### Relación con el diagnóstico de calidad de datos (Sección F)
+### Relación entre ambos análisis
 
 - Los 17 pares de columnas correlacionadas (r>0.9) identificados en calidad
   de datos se resuelven aquí con evidencia: se recomienda conservar
   `dst_host_serror_rate` del grupo de `serror_rate`.
-- `count` y `srv_count` — las features más valiosas según este EDA —
+- `count` y `srv_count` — las features más valiosas según el EDA —
   pertenecen a las 9 columnas de "ventana de 2 segundos" marcadas como
-  riesgo de leakage en la Sección F. Esto eleva la prioridad de que el API
-  de inferencia (Sección M) las recalcule de forma idéntica al histórico.
+  riesgo de leakage en el diagnóstico de calidad. Esto eleva la prioridad
+  de que el API de inferencia (Sección M) las recalcule de forma idéntica
+  al histórico.
 
 
 ## Recomendaciones de limpieza y transformación (para Feature Engineering)
